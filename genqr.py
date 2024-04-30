@@ -1,38 +1,21 @@
-name: Generate QR Code
+import qrcode
 
-on:
-  push:
-    branches:
-      - main
+def generate_qr_code(data, filename):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
 
-jobs:
-  build:
-    name: Generate QR Code
-    runs-on: ubuntu-latest
+    img = qr.make_image(fill_color="black", back_color="white")
+    img.save(filename)
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+if __name__ == "__main__":
+    # Example data for QR code
+    data = "Gurmeet Singh"
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - name: Install dependencies
-      run: pip install qrcode[pil]
-
-    - name: Run Python script
-      run: python generate_qr_code.py
-
-    - name: Commit changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add qrcode.png
-        git commit -m "Add QR code image"
-      
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+    # Generate QR code image
+    generate_qr_code(data, "qrcode.png")
